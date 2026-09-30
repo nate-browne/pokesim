@@ -21,7 +21,7 @@ Now, I should note here that Gen II (the first games with shiny pokemon) actuall
 
 Since Gen II does some weird stuff with HP for the IV value and sp. def and sp. attack are both using the special IV, there are only 4 separate IVs (the aforementioned ones) with 16 possibilities `[0, 16)` and thus there are $16^4 = 65,536$ distinct combinations of IVs that can be generated. Since there is only one (1) way to fulfill condition 1 and eight (8) ways to fulfill condition 2, the probability of a shiny (assuming all combinations are equally likely) is $\frac{1 * 8}{65,536} \rightarrow \frac{8}{65,536} \rightarrow \frac{1}{8,192}$ which is a percentage of `0.01221%`. Yeesh.
 
-From Gen II onwards, algorithmically it's quite a simple calculation. Firstly, take the PV and use bitwise `AND` to pull out bits 32-16 (then rightshift them 16 spots so that you end up with a `uint16_t`).
+From Gen III onwards, algorithmically it's quite a simple calculation. Firstly, take the PV and use bitwise `AND` to pull out bits 32-16 (then rightshift them 16 spots so that you end up with a `uint16_t`).
 Next, take that same PV and use bitwise `AND` to pull out bits 15-0. Call the first result `a`, and the second `b`. Now, we calculate the result with the following equation:
 
 $`\text{result} = \text{TID} \oplus \text{SID} \oplus a \oplus b`$
