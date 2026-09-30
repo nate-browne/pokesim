@@ -39,10 +39,13 @@ def extract_bits(target: int, mask: int) -> int:
 def is_pokemon_shiny(PV: int, TID: int, SID: int, gen3odds: bool) -> bool:
     """
     Given a PV, TID, and SID, figure out if the pokemon is shiny or not. The calculation is a 4-way
-    exclusive OR between the TID, SID, first 16 bits of the PV, and last 16 bits of the PV which results in a
+    XOR between the TID, SID, first 16 bits of the PV, and last 16 bits of the PV which results in a
     uint16_t. In Gen II-V, if that result is less than 8, the pokemon is shiny. In Gen VI+, if the result is less than 16, the pokemon is shiny.
-    The resulting odds end up being 1/8,192 in Gen II-V (0.01221%) and 1/4096 in Gen VI+ (0.02441%)
+    Due to the datatype being a uint16_t from casting downwards (despite the PV being a uint32_t), the possible values to have at the end of the XOR
+    string are in the range [0,65,536). Thus, the resulting odds end up being 8/65,536 --> 1/8,192 in Gen II-V (0.01221%) and 16/65,536 --> 1/4096 in Gen VI+ (0.02441%)
     """
+
+    # shift 16 slots to ignore the 16 0s in spots 0-15 and get the number as a short (16bit) instead of an int (32bit)
     first_16 = extract_bits(PV, TOP_SIXTEEN_MASK) >> 16
     last_16 = extract_bits(PV, BOTTOM_SIXTEEN_MASK)
 
