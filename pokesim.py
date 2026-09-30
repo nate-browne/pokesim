@@ -7,16 +7,13 @@ from sys import exit
 BOTTOM_SIXTEEN_MASK = 0x0000FFFF
 TOP_SIXTEEN_MASK = 0xFFFF0000
 
-RESULTS_STR = "Arithmetic Mean: {}, Median: {}, Mode: {}, Standard Deviation: {}, Lowest: {}, Highest: {}"
+RESULTS_STR = "Arithmetic Mean: {}, Median: {}, Mode: {} (count {}), Standard Deviation: {}, Lowest: {}, Highest: {}"
 
 
 def generate_pokemon_personality_value() -> int:
     """
     Returns a 32 bit unsigned int representing a pokemon's personality value (PV).
-    In Gen III, PV is used to determine the gender, ability, nature, shininess (for all pokemon)
-    as well as some speciality attributes like spinda's spot pattern, unown's letter, wumple's evolution,
-    the gender-counterpart species, and the size of the pokemon. The PV is generated with the pokemon is first
-    encountered.
+    See the README for an explanation of why this matters.
     """
     return random.getrandbits(32)
 
@@ -36,13 +33,14 @@ def extract_bits(target: int, mask: int) -> int:
     return target & mask
 
 
-def is_pokemon_shiny(PV: int, TID: int, SID: int, gen3odds: bool) -> bool:
+def is_pokemon_shiny(
+    PV: int, TID: int, SID: int, gen3odds: bool, shiny_charm: bool
+) -> bool:
     """
-    Given a PV, TID, and SID, figure out if the pokemon is shiny or not. The calculation is a 4-way
-    XOR between the TID, SID, first 16 bits of the PV, and last 16 bits of the PV which results in a
-    uint16_t. In Gen II-V, if that result is less than 8, the pokemon is shiny. In Gen VI+, if the result is less than 16, the pokemon is shiny.
-    Due to the datatype being a uint16_t from casting downwards (despite the PV being a uint32_t), the possible values to have at the end of the XOR
-    string are in the range [0,65,536). Thus, the resulting odds end up being 8/65,536 --> 1/8,192 in Gen II-V (0.01221%) and 16/65,536 --> 1/4096 in Gen VI+ (0.02441%)
+    Given a PV, TID, and SID, figure out if the pokemon is shiny or not. See the README for an explanation on the procedure and the math.
+    If shiny charm is applied, we do the calculation 3 times. Once on the provided PV, then we generate a second and see if shiny, then we generate a third and
+    see if shiny. The real version of this in the games has to account for setting bits on the nature and gender (and other fields) to ensure that the encounter is the
+    "same" (at least in Gen V), but everything else it uses PRNG and sees if we get a shiny.
     """
 
     # shift 16 slots to ignore the 16 0s in spots 0-15 and get the number as a short (16bit) instead of an int (32bit)
@@ -51,10 +49,24 @@ def is_pokemon_shiny(PV: int, TID: int, SID: int, gen3odds: bool) -> bool:
 
     result = TID ^ SID ^ first_16 ^ last_16
 
-    return (result < 8) if gen3odds else (result < 16)
+    shiny = (result < 8) if gen3odds else (result < 16)
+
+    if not shiny:
+        if shiny_charm:
+            for _ in range(2):
+                PV = generate_pokemon_personality_value()
+                first_16 = extract_bits(PV, TOP_SIXTEEN_MASK) >> 16
+                last_16 = extract_bits(PV, BOTTOM_SIXTEEN_MASK)
+
+                result = TID ^ SID ^ first_16 ^ last_16
+                shiny = (result < 8) if gen3odds else (result < 16)
+
+                if shiny:
+                    break
+    return shiny
 
 
-def run_until_shiny(TID: int, SID: int, gen3odds: bool) -> int:
+def run_until_shiny(TID: int, SID: int, gen3odds: bool, shiny_charm: bool) -> int:
     """
     Given a TID and SID, roll the dice over and over until a shiny is hit. Once we do, report how
     many tries it took.
@@ -63,7 +75,7 @@ def run_until_shiny(TID: int, SID: int, gen3odds: bool) -> int:
 
     while True:
         result = is_pokemon_shiny(
-            generate_pokemon_personality_value(), TID, SID, gen3odds
+            generate_pokemon_personality_value(), TID, SID, gen3odds, shiny_charm
         )
         if result:
             break
@@ -72,7 +84,7 @@ def run_until_shiny(TID: int, SID: int, gen3odds: bool) -> int:
     return counter
 
 
-def statistical_trials(TID: int, SID: int, gen3odds: bool) -> None:
+def statistical_trials(TID: int, SID: int, gen3odds: bool, shiny_charm: bool) -> None:
     """
     Let's do some statistics! Grab a number of trials, then do `run_until_shiny` for the set number of trials
     and grab some basic stats from it.
@@ -87,20 +99,24 @@ def statistical_trials(TID: int, SID: int, gen3odds: bool) -> None:
     print("Starting runs...")
 
     for _ in range(trials):
-        results.append(run_until_shiny(TID, SID, gen3odds))
+        results.append(run_until_shiny(TID, SID, gen3odds, shiny_charm))
 
     mean = statistics.mean(results)
     median = statistics.median(results)
     mode = statistics.mode(results)
+    count = results.count(mode)
     sd = statistics.pstdev(results)
     low = min(results)
     high = max(results)
 
     print("Runs complete. Statistics:\n")
-    print(RESULTS_STR.format(mean, median, mode, sd, low, high))
+    print(RESULTS_STR.format(mean, median, mode, count, sd, low, high))
 
 
 if __name__ == "__main__":
+
+    random.seed(None)
+
     TID = generate_trainer_secret_id()
     SID = generate_trainer_secret_id()
     print(f"\nSave file started. TID: {TID}, SID: {SID}")
@@ -112,6 +128,14 @@ if __name__ == "__main__":
         exit(0)
 
     gen3odds = True if odds == "2" else False
+
+    try:
+        charm = input("Use shiny charm (y/n)? ").upper()
+    except (KeyboardInterrupt, EOFError):
+        print("Exiting...")
+        exit(0)
+
+    shiny_charm = True if charm == "Y" else False
 
     while True:
         try:
@@ -125,14 +149,14 @@ if __name__ == "__main__":
         match opt:
             case "O":
                 print(
-                    f"\nPokemon {"is" if is_pokemon_shiny(generate_pokemon_personality_value(), TID, SID, gen3odds) else "is not"} shiny"
+                    f"\nPokemon {"is" if is_pokemon_shiny(generate_pokemon_personality_value(), TID, SID, gen3odds, shiny_charm) else "is not"} shiny"
                 )
             case "U":
                 print("\nRunning until shiny...")
-                count = run_until_shiny(TID, SID, gen3odds)
+                count = run_until_shiny(TID, SID, gen3odds, shiny_charm)
                 print(f"Complete. Number of resets before shiny: {count}")
             case "S":
-                statistical_trials(TID, SID, gen3odds)
+                statistical_trials(TID, SID, gen3odds, shiny_charm)
             case "R":
                 TID = generate_trainer_secret_id()
                 SID = generate_trainer_secret_id()
