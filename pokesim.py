@@ -3,6 +3,7 @@
 import random
 import statistics
 from sys import exit
+from typing import List
 
 BOTTOM_SIXTEEN_MASK = 0x0000FFFF
 TOP_SIXTEEN_MASK = 0xFFFF0000
@@ -89,7 +90,7 @@ def statistical_trials(TID: int, SID: int, gen3odds: bool, shiny_charm: bool) ->
     Let's do some statistics! Grab a number of trials, then do `run_until_shiny` for the set number of trials
     and grab some basic stats from it.
     """
-    results = []
+    results: List[int] = []
     trials = int(
         input(
             "\nEnter number of trials to do. Recommend at least 250, but doing too many _will_ slow down your machine: "
