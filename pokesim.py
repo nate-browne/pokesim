@@ -40,8 +40,7 @@ def is_pokemon_shiny(
     """
     Given a PV, TID, and SID, figure out if the pokemon is shiny or not. See the README for an explanation on the procedure and the math.
     If shiny charm is applied, we do the calculation 3 times. Once on the provided PV, then we generate a second and see if shiny, then we generate a third and
-    see if shiny. The real version of this in the games has to account for setting bits on the nature and gender (and other fields) to ensure that the encounter is the
-    "same" (at least in Gen V), but everything else it uses PRNG and sees if we get a shiny.
+    see if shiny.
     """
 
     # shift 16 slots to ignore the 16 0s in spots 0-15 and get the number as a short (16bit) instead of an int (32bit)
