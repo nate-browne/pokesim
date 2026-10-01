@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import random
+import argparse
 import statistics
 from sys import exit
-from typing import List
+from typing import List, Tuple
 
 BOTTOM_SIXTEEN_MASK = 0x0000FFFF
 TOP_SIXTEEN_MASK = 0xFFFF0000
@@ -113,12 +114,47 @@ def statistical_trials(TID: int, SID: int, gen3odds: bool, shiny_charm: bool) ->
     print(RESULTS_STR.format(mean, median, mode, count, sd, low, high))
 
 
+def _parse_args() -> Tuple[int, int]:
+    parser = argparse.ArgumentParser(
+        prog="pokesim",
+        description="Shiny odds simulator for the sake of statistics",
+    )
+
+    parser.add_argument(
+        "-t",
+        "--trainerid",
+        help="Provide a trainer ID, if you want to use an existing one",
+    )
+    parser.add_argument(
+        "-s",
+        "--secretid",
+        help="Provide the secret ID, if you want to use an existing one",
+    )
+
+    args = parser.parse_args()
+
+    if args.trainerid:
+        if not args.trainerid.isdigit():
+            raise ValueError(f"Argument {args.trainerid} is not a digit")
+        TID = int(args.trainerid)
+    else:
+        TID = generate_trainer_secret_id()
+
+    if args.secretid:
+        if not args.secretid.isdigit():
+            raise ValueError(f"Argument {args.secretid} is not a digit")
+        SID = int(args.secretid)
+    else:
+        SID = generate_trainer_secret_id()
+
+    return TID, SID
+
+
 if __name__ == "__main__":
 
     random.seed(None)
+    TID, SID = _parse_args()
 
-    TID = generate_trainer_secret_id()
-    SID = generate_trainer_secret_id()
     print(f"\nSave file started. TID: {TID}, SID: {SID}")
 
     try:
