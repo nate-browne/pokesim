@@ -8,7 +8,7 @@ from math import floor, sqrt
 
 from utils import Pokemon, BALLS, STATUS, POKEMON_NUMBER_MAP, RESULTS_STR
 
-OPT_STR = "(t)hrow one ball, throw (u)ntil caught, (s)tatistical analysis, (p)robabilty of a catch: "
+OPT_STR = "\n(t)hrow one ball, throw (u)ntil caught, (s)tatistical analysis, (p)robabilty of a catch, (q)uit: "
 
 
 def calculate_modified_catch_rate(
@@ -37,6 +37,11 @@ def shake_check(shake_probability_threshold: int) -> bool:
 def run_full_catch(
     mon: Pokemon, ball: str, status: str, hp: int, turn_number: int = 1
 ) -> int:
+
+    # short circuit for master ball
+    if ball == "master":
+        return 4
+
     shake_probability_threshold = calculate_shake_probability(
         calculate_modified_catch_rate(mon, ball, status, hp, turn_number)
     )
@@ -58,7 +63,7 @@ def statistical_analysis(mon: Pokemon, status: str, hp: int) -> None:
     try:
         trials = int(
             input(
-                "Enter number of trials (minimum 100). Larger numbers will slow down your machine: "
+                "\nEnter number of trials (minimum 100). Larger numbers will slow down your machine: "
             )
         )
     except (KeyboardInterrupt, EOFError):
@@ -87,7 +92,7 @@ def grab_ball() -> str:
         print(f"{ball}")
 
     try:
-        ball = input("Enter the full name of the ball you want to use: ")
+        ball = input("\nEnter the full name of the ball you want to use: ")
     except (KeyboardInterrupt, EOFError):
         print("Exiting")
         exit(0)
@@ -104,7 +109,7 @@ def throw_until_caught(mon: Pokemon, status: str, hp: int, ball: str) -> int:
         shakes = run_full_catch(mon, ball, status, hp)
 
         if shakes == 4:
-            print("Pokemon caught!")
+            print("\nPokemon caught!")
             break
         print(f"Pokemon not caught. Number of shakes: {shakes}")
         counter += 1
@@ -118,7 +123,7 @@ def throw_one_ball(mon: Pokemon, status: str, hp: int):
     shakes = run_full_catch(mon, ball, status, hp)
 
     if shakes == 4:
-        print("Pokemon caught!")
+        print("\nPokemon caught!")
     else:
         print(f"Pokemon not caught. Number of shakes: {shakes}")
 
@@ -129,7 +134,7 @@ def calculate_catch_probability(mon: Pokemon, status: str, hp: int):
 
     turn_number = int(
         input(
-            "Enter number of turns of this catch. Must be <= 1. This really only matters if you're using a timer ball: "
+            "\nEnter number of turns of this catch. Must be >= 1. This really only matters if you're using a timer ball: "
         )
     )
 
@@ -145,7 +150,7 @@ def grab_values() -> Tuple[Pokemon, str, int]:
         print(f"{key}: {mon.name}")
 
     try:
-        mon = input("Pick a mon (enter the number): ")
+        mon = input("\nPick a mon (enter the number): ")
     except (KeyboardInterrupt, EOFError):
         print("Exiting")
         exit(0)
@@ -159,7 +164,7 @@ def grab_values() -> Tuple[Pokemon, str, int]:
         print(f"{status}")
 
     try:
-        status = input("Enter the full name of the status you want to use: ")
+        status = input("\nEnter the full name of the status you want to use: ")
     except (KeyboardInterrupt, EOFError):
         print("Exiting")
         exit(0)
@@ -169,7 +174,7 @@ def grab_values() -> Tuple[Pokemon, str, int]:
 
     print(f"Your pokemon {mon.name} has a default HP of {mon.hp}")
     try:
-        hp = int(input(f"Enter a value for the HP you want to catch (1, {mon.hp}): "))
+        hp = int(input(f"\nEnter a value for the HP you want to catch (1, {mon.hp}): "))
     except (KeyboardInterrupt, EOFError):
         print("Exiting")
         exit(0)
@@ -203,5 +208,7 @@ if __name__ == "__main__":
                 statistical_analysis(mon, status, hp)
             case "P":
                 calculate_catch_probability(mon, status, hp)
+            case "Q":
+                break
             case _:
                 print(f"Command {cmd} not valid.")
