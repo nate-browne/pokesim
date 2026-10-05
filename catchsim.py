@@ -14,6 +14,9 @@ OPT_STR = "\n(t)hrow one ball, throw (u)ntil caught, (s)tatistical analysis, (p)
 def calculate_modified_catch_rate(
     mon: Pokemon, ball: str, status: str, hp: int, turns: int
 ) -> float:
+    """
+    Calculates the catch rate for the given pokemon with the modifiers applied.
+    """
 
     if ball == "timer":
         br = min((turns * 10 // 10), 4)
@@ -31,10 +34,17 @@ def calculate_modified_catch_rate(
 
 
 def calculate_shake_probability(mod_catch_rate: float) -> int:
+    """
+    Returns a short between [0, 65,536) used to check for shakes.
+    """
     return 1048560 // floor(sqrt(sqrt(16711680 // mod_catch_rate)))
 
 
 def shake_check(shake_probability_threshold: int) -> bool:
+    """
+    Randomly generates a 16-bit short (uint16-t), and checks if the value is lower
+    than the shake probability threshold. If so, the shake check passes and a shake occurs.
+    """
     val = random.getrandbits(16)
     return val < shake_probability_threshold
 
@@ -42,6 +52,9 @@ def shake_check(shake_probability_threshold: int) -> bool:
 def run_full_catch(
     mon: Pokemon, ball: str, status: str, hp: int, turn_number: int = 1
 ) -> int:
+    """
+    Runs a full catch sequence. For a pokemon to be caught, 4 shake checks must pass in a row.
+    """
 
     # short circuit for master ball
     if ball == "master":
