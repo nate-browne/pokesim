@@ -17,6 +17,11 @@ def calculate_modified_catch_rate(
 
     if ball == "timer":
         br = min((turns * 10 // 10), 4)
+    elif ball == "net":
+        if "water" not in mon.types and "bug" not in mon.types:
+            br = 1
+        else:
+            br = BALLS[ball]
     else:
         br = BALLS[ball]
 
@@ -140,7 +145,11 @@ def calculate_catch_probability(mon: Pokemon, status: str, hp: int):
 
     a = calculate_modified_catch_rate(mon, ball, status, hp, turn_number)
 
-    print(f"Probability of catching {mon.name} at hp {hp}: {(a / 255) * 100}%")
+    probability = 100 if ball == "master" else (a / 255) * 100
+
+    print(
+        f"Probability of catching {mon.name} at hp {hp} with ball {ball}: {probability}%"
+    )
 
 
 def grab_values() -> Tuple[Pokemon, str, int]:

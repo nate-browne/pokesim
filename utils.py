@@ -32,7 +32,7 @@ BALLS = {
     "regular": 1,
     "great": 1.5,
     "ultra": 2,
-    "net": 3.5,
+    "net": 3,
     "timer": 0,
 }
 
