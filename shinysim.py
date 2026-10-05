@@ -6,10 +6,10 @@ import statistics
 from sys import exit
 from typing import List, Tuple
 
+from utils import RESULTS_STR
+
 BOTTOM_SIXTEEN_MASK = 0x0000FFFF
 TOP_SIXTEEN_MASK = 0xFFFF0000
-
-RESULTS_STR = "Arithmetic Mean: {}, Median: {}, Mode: {} (count {}), Standard Deviation: {}, Lowest: {}, Highest: {}"
 
 
 def generate_pokemon_personality_value() -> int:

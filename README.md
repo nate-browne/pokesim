@@ -1,5 +1,7 @@
-# Pokesim
-## Simulate Shiny Hunts and Statistical Testing
+# Pokésim
+## Programs that Emulate some of the RNG Present in Pokémon
+
+## ShinySim
 
 ### Intro
 This is a short and sweet lil program written in Python for the sake of showcasing just how... unfun,
@@ -38,3 +40,9 @@ Finally, let's talk about the Shiny Charm. This was added in Gen V and is in eve
 This program is a way of visualizing just how rough the shiny hunt can be, minus the resetting and the mashing (so it's still even faster than a real shiny hunt). When you start it up, it'll generate a random TID and SID for you and using those will allow you to shiny hunt. The program options are to roll once for a shiny, keep rolling until you get a shiny, or do statistical analysis on trials. The first one is self-explanatory, rolling till shiny just runs the program until a shiny is found and reports back with the number of resets (smallest would be 0 if you manage to get a shiny immediately), and the last option allows you to input a number of trials to do. It will then roll until shiny, storing the number of resets to get to that shiny, for the number of trials you specify. Then, it will get the arithmetic mean, the median, the mode, the standard deviation, the lowest number of resets, and the highest number of resets.
 
 Some features it includes are the ability to use Gen II-V probability vs Gen VI+ probability, the shiny charm, the option to provide your own trainer ID and secret ID, and the ability to reset your trainer and secret ID whenever you want.
+
+## CatchSim
+
+### Intro
+This is another quick program that exist to emulate the experience of catching a Pokémon. If you've ever been curious about how the catch odds work, or want to try something out that you've
+never tried in the game, this is the program to run.
