@@ -126,7 +126,7 @@ def throw_until_caught(
 
     counter = 1
     while True:
-        shakes = run_full_catch(mon, ball, status, hp)
+        shakes = run_full_catch(mon, ball, status, hp, counter)
 
         if shakes == 4:
             if print_output:
