@@ -19,7 +19,7 @@ def calculate_modified_catch_rate(
     """
 
     if ball == "timer":
-        br = min((turns * 10 // 10), 4)
+        br = min(((turns * 10) // 10), 4)
     elif ball == "net":
         if "water" not in mon.types and "bug" not in mon.types:
             br = 1
