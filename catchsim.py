@@ -37,7 +37,7 @@ def calculate_shake_probability(mod_catch_rate: float) -> int:
     """
     Returns a short between [0, 65,536) used to check for shakes.
     """
-    return 1048560 // floor(sqrt(sqrt(16711680 // mod_catch_rate)))
+    return 1_048_560 // floor(sqrt(sqrt(16_711_680 // mod_catch_rate)))
 
 
 def shake_check(shake_probability_threshold: int) -> bool:
