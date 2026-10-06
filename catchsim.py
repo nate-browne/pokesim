@@ -8,7 +8,7 @@ from math import floor, sqrt
 
 from utils import Pokemon, BALLS, STATUS, POKEMON_NUMBER_MAP, RESULTS_STR
 
-OPT_STR = "\n(t)hrow one ball, throw (u)ntil caught, (s)tatistical analysis, (p)robabilty of a catch, (q)uit: "
+OPT_STR = "\n(t)hrow one ball, throw (u)ntil caught, (s)tatistical analysis, (p)robabilty of a catch, (c)hange values, (q)uit: "
 
 
 def calculate_modified_catch_rate(
@@ -234,6 +234,8 @@ if __name__ == "__main__":
                 statistical_analysis(mon, status, hp)
             case "P":
                 calculate_catch_probability(mon, status, hp)
+            case "C":
+                mon, status, hp = grab_values()
             case "Q":
                 break
             case _:
