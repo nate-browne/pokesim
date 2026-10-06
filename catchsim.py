@@ -91,7 +91,7 @@ def statistical_analysis(mon: Pokemon, status: str, hp: int) -> None:
     results = []
 
     for _ in range(trials):
-        results.append(throw_until_caught(mon, status, hp, ball))
+        results.append(throw_until_caught(mon, status, hp, ball, print_output=False))
 
     mean = statistics.mean(results)
     median = statistics.median(results)
@@ -120,16 +120,20 @@ def grab_ball() -> str:
     return ball
 
 
-def throw_until_caught(mon: Pokemon, status: str, hp: int, ball: str) -> int:
+def throw_until_caught(
+    mon: Pokemon, status: str, hp: int, ball: str, print_output: bool = True
+) -> int:
 
     counter = 1
     while True:
         shakes = run_full_catch(mon, ball, status, hp)
 
         if shakes == 4:
-            print("\nPokemon caught!")
+            if print_output:
+                print("\nPokemon caught!")
             break
-        print(f"Pokemon not caught. Number of shakes: {shakes}")
+        if print_output:
+            print(f"Pokemon not caught. Number of shakes: {shakes}")
         counter += 1
     return counter
 
@@ -158,10 +162,10 @@ def calculate_catch_probability(mon: Pokemon, status: str, hp: int):
 
     a = calculate_modified_catch_rate(mon, ball, status, hp, turn_number)
 
-    probability = 100 if ball == "master" else (a / 255) * 100
+    probability = 100 if ball == "master" else round((a / 255) * 100, 2)
 
     print(
-        f"Probability of catching {mon.name} at hp {hp} with ball {ball}: {probability}%"
+        f"Probability of catching {mon.name} with status: {status} at HP {hp} with ball {ball}: {probability}%"
     )
 
 
