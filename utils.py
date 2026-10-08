@@ -23,7 +23,7 @@ POKEMON_NUMBER_MAP: Dict[str, Pokemon] = {
     "10": Pokemon("Skarmory", 79, ["steel", "flying"], 25),
     "11": Pokemon("Deoxys", 70, ["psychic"], 3),
     "12": Pokemon("Latios", 140, ["dragon", "psychic"], 3),
-    "13": Pokemon("Rayquaza", 227, ["dragon", "flyging"], 3),
+    "13": Pokemon("Rayquaza", 227, ["dragon", "flying"], 3),
 }
 
 
